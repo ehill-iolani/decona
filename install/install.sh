@@ -75,7 +75,7 @@ if [ -z "$name" ]; then
 fi
 
 # Check for potential errors before we start.
-if ! type conda &> /dev/null; then
+if ! type mamba &> /dev/null; then
     echo "Please install Miniconda (https://docs.conda.io/en/latest/miniconda.html), and make sure it is on your PATH and initialised." >&2
     exit 2
 fi
@@ -83,7 +83,7 @@ if [ -d "$prefix" ]; then
     echo "Install directory '$prefix' already exists, please select another directory with -p <directory> or --prefix <directory>." >&2
     exit 17
 fi
-if conda env list | grep -qE "(^|[[:space:]]+)$name\*?([[:space:]]+|$)"; then
+if mamba env list | grep -qE "(^|[[:space:]]+)$name\*?([[:space:]]+|$)"; then
     echo "Environment with the name '$name' already exists, please specify a custom environment name or prefix." >&2
     exit 17
 fi
@@ -130,13 +130,13 @@ echo "Creating Python environment and installing packages, this might take a lon
 env_file="$script_path/decona.yml"
 if [ -z "$prefix" ]; then
     # Use conda's default environment location.
-    conda env create -f "$env_file" --name "$name" > /dev/null
+    mamba env create -f "$env_file" --name "$name" > /dev/null
     # Get the path of the newly created environment.
-    prefix=$(conda env list | grep -Po "(?<=$name).*$" | tr -d ' ')
+    prefix=$(mamba env list | grep -Po "(?<=$name).*$" | tr -d ' ')
     activation_name="$name"
 else
     # Create environment in the specified location.
-    conda env create --prefix "$prefix" -f "$env_file" > /dev/null
+    mamba env create --prefix "$prefix" -f "$env_file" > /dev/null
     activation_name="$prefix"
 fi
 
@@ -148,4 +148,4 @@ ln -s "$script_path/../external/cdhit/cd-hit-est" "$prefix/bin"
 ln -s "$script_path/../external/cdhit/plot_len1.pl" "$prefix/bin"
 ln -s "$script_path/../external/cdhit/make_multi_seq.pl" "$prefix/bin"
 
-echo "Installed Decona and created a new Python environment; use 'conda activate $activation_name' to activate it, then run 'decona'."
+echo "Installed Decona and created a new Python environment; use 'mamba activate $activation_name' to activate it, then run 'decona'."
