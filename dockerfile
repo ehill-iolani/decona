@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Convenience packages
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y curl git g++ zlib1g-dev make bsdmainutils gawk bcftools libopenblas-base wget nano
+RUN apt install -y curl git g++ zlib1g-dev make bsdmainutils gawk libopenblas-base wget nano libssl-dev
 
 # Conda/Mamba installation
 RUN cd tmp
@@ -34,6 +34,7 @@ SHELL ["mamba", "run", "-n", "decona", "/bin/bash", "-c"]
 RUN mamba init && \
     mamba install -y -c bioconda blast=2.11.0 && \
     mamba install -y pandas=1.4.1 && \
+    mamba install -y -c bioconda -c conda-forge bcftools=1.10 && \
     echo "mamba activate decona" >> ~/.bashrc && \
     mkdir /home/data
 
