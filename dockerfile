@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Convenience packages
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y curl git g++ zlib1g-dev make bsdmainutils gawk libopenblas-base wget nano libssl-dev
+RUN apt install -y curl git g++ zlib1g-dev make bsdmainutils gawk libopenblas-base wget nano libssl-dev pip
 
 # Conda/Mamba installation
 RUN cd tmp
@@ -23,10 +23,13 @@ RUN conda update -y conda
 RUN conda install -y -c conda-forge mamba
 
 # Install base decona
-RUN mkdir /home/github && \
-    cd /home/github && \
-    git clone https://github.com/ehill-iolani/decona.git
-RUN sed -i -e "s/\r$//" /home/github/decona/install/install.sh
+RUN mkdir /home/github
+
+COPY . /home/github/decona
+
+RUN cd /home/github/decona && \
+    sed -i -e "s/\r$//" /home/github/decona/install/install.sh
+
 RUN bash /home/github/decona/install/install.sh
 SHELL ["mamba", "run", "-n", "decona", "/bin/bash", "-c"]
 
@@ -34,7 +37,8 @@ SHELL ["mamba", "run", "-n", "decona", "/bin/bash", "-c"]
 RUN mamba init && \
     mamba install -y -c bioconda blast=2.11.0 && \
     mamba install -y pandas=1.4.1 && \
-    mamba install -y -c bioconda -c conda-forge bcftools=1.10 && \
+    mamba install -y -c bioconda -c conda-forge bcftools=1.11 samtools=1.19.2 && \
+    pip install medaka pyabpoa && \
     echo "mamba activate decona" >> ~/.bashrc && \
     mkdir /home/data
 
